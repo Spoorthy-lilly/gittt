@@ -1,0 +1,41 @@
+# .github/workflows/build-and-deploy.yml
+
+name: Build and Deploy My App    # 👈 Name shown in GitHub UI
+
+# ────────────────────────────────────────────
+# WHEN should this run?
+# ────────────────────────────────────────────
+on:
+  push:
+    branches:
+      - main                     # Run when code is pushed to main
+
+# ────────────────────────────────────────────
+# WHAT should it do?
+# ────────────────────────────────────────────
+jobs:
+  build:
+    runs-on: ubuntu-latest       # Use a fresh Linux machine
+
+    steps:
+      # Step 1: Download my code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Log into AWS
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::283234040926:role/my-github-role
+          aws-region: us-east-2
+
+      # Step 3: Log into ECR
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # Step 4: Build and push image
+      - name: Build and push Docker image
+        run: |
+          docker build -t my-cool-app .
+          docker tag my-cool-app 283234040926.dkr.ecr.us-east-2.amazonaws.com/my-cool-app:sha-${{ github.sha }}
+          docker push 283234040926.dkr.ecr.us-east-2.amazonaws.com/my-cool-app:sha-${{ github.sha }}
