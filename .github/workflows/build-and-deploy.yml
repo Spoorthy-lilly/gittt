@@ -11,6 +11,13 @@ on:
       - main                     # Run when code is pushed to main
 
 # ────────────────────────────────────────────
+# PERMISSIONS needed for OIDC auth with AWS
+# ────────────────────────────────────────────
+permissions:
+  id-token: write                # Required to request the OIDC JWT
+  contents: read                 # Required to checkout the repo
+
+# ────────────────────────────────────────────
 # WHAT should it do?
 # ────────────────────────────────────────────
 jobs:
